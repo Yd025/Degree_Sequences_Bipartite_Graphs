@@ -64,3 +64,44 @@ def count_subforests_with_unique_degree_sequences_bipartite(graph):
             unique_degree_sequences.add(degree_seq)
     
     return count_forests, unique_degree_sequences
+
+def count_subforests_recursive(G):
+    """
+    Finds subforests by recursively building them and pruning cycles.
+    """
+    if not G.is_bipartite():
+        raise ValueError("The input graph must be bipartite!")
+
+    edges = list(G.edges(labels=False))
+    vertices = list(G.vertices())
+    n_edges = len(edges)
+    unique_sequences = set()
+    
+    # We use a single graph object and add/remove edges to save memory
+    current_forest = Graph([vertices, []], format='vertices_and_edges')
+
+    def backtrack(edge_idx):
+        # Base case when all egdes are implemented
+        if edge_idx == n_edges:
+            seq = tuple(current_forest.degree_sequence())
+            unique_sequences.add(seq)
+            return 1
+
+        count = 0
+        
+        # First branch to skip the current edge
+        count += backtrack(edge_idx + 1)
+
+        # Second branch to add the current edge if it doesn't create a cycle
+        u, v = edges[edge_idx]
+        if not current_forest.connected_component_containing_vertex(u) == \
+               current_forest.connected_component_containing_vertex(v):
+            
+            current_forest.add_edge(u, v)
+            count += backtrack(edge_idx + 1)
+            current_forest.delete_edge(u, v) # Backtrack
+            
+        return count
+
+    total_forests = backtrack(0)
+    return total_forests, unique_sequences
