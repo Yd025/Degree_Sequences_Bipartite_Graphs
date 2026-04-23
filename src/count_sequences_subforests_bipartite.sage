@@ -54,14 +54,13 @@ def count_subforests_with_unique_degree_sequences_bipartite(graph):
         
         # Create subgraph with the selected edges
         subgraph = graph.subgraph(vertices=vertices, edges=selected_edges)
+        # Extract degree sequence and add to set
+        degree_seq = get_degree_sequence(subgraph)
+        unique_degree_sequences.add(degree_seq)
         
         # Check if it's a forest
         if subgraph.is_forest():
-            count_forests += 1
-            
-            # Extract degree sequence and add to set
-            degree_seq = get_degree_sequence(subgraph)
-            unique_degree_sequences.add(degree_seq)
+            count_forests += 1t
     
     return count_forests, unique_degree_sequences
 
